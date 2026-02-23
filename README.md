@@ -1,64 +1,57 @@
-ECHO
+# ECHO
 
-Multimodal Misinformation & AI-Generated Content Detection System
+## Multimodal Misinformation & AI-Generated Content Detection System
 
 ECHO is a full-stack AI system that detects misinformation and synthetic media across text, images, and short videos.
 
 It consists of:
 
-A Python FastAPI backend
+- A Python FastAPI backend  
+- PostgreSQL with pgvector for semantic similarity  
+- Multimodal ML pipelines (text, image, video)  
+- A Chrome browser extension for real-time webpage detection  
 
-PostgreSQL with pgvector for semantic similarity
+---
 
-Multimodal ML pipelines (text, image, video)
-
-A Chrome browser extension for real-time webpage detection
-
-Problem
+## Problem
 
 Misinformation spreads rapidly across:
 
-News websites
-
-Blogs
-
-Social media posts
-
-Image-based quotes
-
-Short-form video platforms
+- News websites  
+- Blogs  
+- Social media posts  
+- Image-based quotes  
+- Short-form video platforms  
 
 There is no unified system that detects:
 
-Fake text
-
-AI-generated text
-
-AI-generated images
-
-Misinformation inside images
-
-Misinformation spoken inside videos
+- Fake text  
+- AI-generated text  
+- AI-generated images  
+- Misinformation inside images  
+- Misinformation spoken inside videos  
 
 ECHO solves this using a multimodal detection pipeline.
 
-Solution Overview
+---
+
+## Solution Overview
 
 ECHO analyzes:
 
-Raw text
-
-Article URLs
-
-Images
-
-Short videos
-
-Active webpage content via browser extension
+- Raw text  
+- Article URLs  
+- Images  
+- Short videos  
+- Active webpage content via browser extension  
 
 It outputs a structured risk score with classification and explanation.
 
-System Architecture
+---
+
+## System Architecture
+
+```
 Chrome Extension
         ↓
 FastAPI Backend
@@ -73,229 +66,201 @@ FastAPI Backend
 --------------------------------------------------
         ↓
 PostgreSQL + pgvector
-Core Components
-1. URL Scraper / Content Extractor
+```
 
-Purpose:
+---
 
-Extract article text from webpage URLs
+## Core Components
 
-Clean HTML
+### 1. URL Scraper / Content Extractor
 
-Identify domain
+**Purpose**
 
-Libraries:
+- Extract article text from webpage URLs  
+- Clean HTML  
+- Identify domain  
 
-requests
+**Libraries**
 
-BeautifulSoup
-
-newspaper3k
+- requests  
+- BeautifulSoup  
+- newspaper3k  
 
 This enables automatic analysis of live web articles.
 
-2. Text Analysis Engine
+---
 
-Detects:
+### 2. Text Analysis Engine
 
-Fake or misleading content
+**Detects**
 
-AI-generated text
+- Fake or misleading content  
+- AI-generated text  
 
-Models:
+**Models**
 
-Transformer-based classifier (RoBERTa / DeBERTa)
+- Transformer-based classifier (RoBERTa / DeBERTa)  
+- Sentence-Transformer embeddings  
 
-Sentence-Transformer embeddings
+**Framework**
 
-Framework:
+- PyTorch  
+- Hugging Face Transformers  
 
-PyTorch
+---
 
-Hugging Face Transformers
+### 3. Image Analysis Engine
 
-3. Image Analysis Engine
+**Pipeline**
 
-Pipeline:
+- Generate CLIP embedding  
+- Detect AI-generated image patterns  
+- Extract embedded text via OCR  
+- Run extracted text through fake classifier  
 
-Generate CLIP embedding
+**Libraries**
 
-Detect AI-generated image patterns
+- torchvision  
+- timm  
+- open_clip  
+- easyocr  
 
-Extract embedded text via OCR
+---
 
-Run extracted text through fake classifier
+### 4. Video / Reel Analysis Engine
 
-Libraries:
+**Pipeline**
 
-torchvision
+- Extract audio from video  
+- Transcribe using Whisper  
+- Run transcript through fake classifier  
+- Sample keyframes  
+- Run AI-image detection on frames  
+- Aggregate results  
 
-timm
+**Libraries**
 
-open_clip
+- moviepy  
+- opencv-python  
+- faster-whisper  
 
-easyocr
+---
 
-4. Video / Reel Analysis Engine
+### 5. Vector Similarity Engine
 
-Pipeline:
+**Purpose**
 
-Extract audio from video
+- Compare content against known fake corpus  
+- Compare against trusted sources  
 
-Transcribe using Whisper
+**Technology**
 
-Run transcript through fake classifier
+- Sentence-Transformers  
+- CLIP embeddings  
+- PostgreSQL with pgvector  
+- Cosine similarity search  
 
-Sample keyframes
+---
 
-Run AI-image detection on frames
-
-Aggregate results
-
-Libraries:
-
-moviepy
-
-opencv-python
-
-faster-whisper
-
-5. Vector Similarity Engine
-
-Purpose:
-
-Compare content against known fake corpus
-
-Compare against trusted sources
-
-Technology:
-
-Sentence-Transformers
-
-CLIP embeddings
-
-PostgreSQL with pgvector
-
-Cosine similarity search
-
-6. Risk Aggregation Engine
+### 6. Risk Aggregation Engine
 
 Final risk calculation:
 
+```
 risk =
 0.35 * fake_score +
 0.20 * ai_text_score +
 0.20 * ai_image_score +
 0.25 * similarity_score
+```
 
-Risk Levels:
+**Risk Levels**
 
-< 0.3 → LOW
+- < 0.3 → LOW  
+- 0.3–0.6 → MEDIUM  
+- > 0.6 → HIGH  
 
-0.3–0.6 → MEDIUM
+---
 
-0.6 → HIGH
-
-Chrome Extension
+## Chrome Extension
 
 The browser extension allows users to detect misinformation directly on webpages.
 
-Functionality:
+**Functionality**
 
-Captures current page text
+- Captures current page text  
+- Sends data to backend  
+- Displays risk score  
+- Shows AI-detection probability  
 
-Sends data to backend
+**Popup UI**
 
-Displays risk score
-
-Shows AI-detection probability
-
-Popup UI:
-
+```
 Detect the False!
 
 Risk Score: 0.72
 Label: HIGH
 Likely AI Generated: Yes
+```
 
 The extension communicates with the FastAPI backend via REST API.
 
-Tech Stack
-Backend
+---
 
-Python 3.10+
+## Tech Stack
 
-FastAPI
+### Backend
+- Python 3.10+  
+- FastAPI  
+- Uvicorn  
+- SQLAlchemy  
+- Alembic  
 
-Uvicorn
+### Database
+- PostgreSQL 15  
+- pgvector extension  
 
-SQLAlchemy
+### Machine Learning
+- torch  
+- transformers  
+- sentence-transformers  
 
-Alembic
+### Vision
+- torchvision  
+- timm  
+- open_clip  
 
-Database
+### OCR
+- easyocr  
 
-PostgreSQL 15
+### Video Processing
+- moviepy  
+- opencv-python  
 
-pgvector extension
+### Speech-to-Text
+- faster-whisper  
 
-Machine Learning
+### Scraping
+- requests  
+- beautifulsoup4  
+- newspaper3k  
 
-torch
+### Infrastructure
+- Docker  
+- Docker Compose  
+- Render (deployment)  
 
-transformers
+### Frontend
+- HTML  
+- CSS  
+- JavaScript  
+- Chrome Extension APIs  
 
-sentence-transformers
+---
 
-Vision
+## Project Structure
 
-torchvision
-
-timm
-
-open_clip
-
-OCR
-
-easyocr
-
-Video Processing
-
-moviepy
-
-opencv-python
-
-Speech-to-Text
-
-faster-whisper
-
-Scraping
-
-requests
-
-beautifulsoup4
-
-newspaper3k
-
-Infrastructure
-
-Docker
-
-Docker Compose
-
-Render (deployment)
-
-Frontend
-
-HTML
-
-CSS
-
-JavaScript
-
-Chrome Extension APIs
-
-Project Structure
+```bash
 ECHO/
 │
 ├── app/
@@ -324,21 +289,24 @@ ECHO/
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
-API Design
-POST /analyze
+```
 
-Accepts:
+---
 
-text
+## API Design
 
-image file
+### POST /analyze
 
-video file
+**Accepts**
 
-url
+- text  
+- image file  
+- video file  
+- url  
 
-Returns:
+**Returns**
 
+```json
 {
   "risk_score": 0.72,
   "risk_label": "HIGH",
@@ -347,65 +315,67 @@ Returns:
   "ai_image_score": 0.49,
   "similarity_score": 0.76
 }
-How This Project Was Built (Step-by-Step)
+```
 
-Designed multimodal architecture.
+---
 
-Implemented FastAPI backend.
+## How This Project Was Built
 
-Integrated PostgreSQL with pgvector.
+1. Designed multimodal architecture  
+2. Implemented FastAPI backend  
+3. Integrated PostgreSQL with pgvector  
+4. Added text fake detection using Transformers  
+5. Added AI-text detection  
+6. Integrated CLIP for image embeddings  
+7. Added OCR pipeline for image-based misinformation  
+8. Integrated Whisper for video speech detection  
+9. Implemented similarity search using pgvector  
+10. Designed unified risk scoring engine  
+11. Dockerized backend and database  
+12. Deployed to Render  
+13. Built Chrome extension to connect to API  
 
-Added text fake detection using Transformers.
+---
 
-Added AI-text detection.
+## Installation
 
-Integrated CLIP for image embeddings.
+### Clone Repository
 
-Added OCR pipeline for image-based misinformation.
-
-Integrated Whisper for video speech detection.
-
-Implemented similarity search using pgvector.
-
-Designed unified risk scoring engine.
-
-Dockerized backend and database.
-
-Deployed to Render.
-
-Built Chrome extension to connect to API.
-
-Installation
-Clone Repository
+```bash
 git clone https://github.com/yourusername/ECHO.git
 cd ECHO
-Run Locally with Docker
+```
+
+### Run Locally with Docker
+
+```bash
 docker-compose up --build
-Deployment
+```
+
+---
+
+## Deployment
 
 Platform: Render
 
-Push repository to GitHub
-
-Create Web Service
-
-Attach PostgreSQL
-
-Set environment variables
-
-Deploy
+1. Push repository to GitHub  
+2. Create Web Service  
+3. Attach PostgreSQL  
+4. Set environment variables  
+5. Deploy  
 
 Start command:
 
+```bash
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
-Use Cases
+```
 
-Journalists verifying content authenticity
+---
 
-Students checking article credibility
+## Use Cases
 
-Social media users detecting AI-generated posts
-
-Fact-checking workflows
-
-Media literacy tools
+- Journalists verifying content authenticity  
+- Students checking article credibility  
+- Social media users detecting AI-generated posts  
+- Fact-checking workflows  
+- Media literacy tools  
